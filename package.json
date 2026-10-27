@@ -1,0 +1,11 @@
+{
+  "name": "spendwise-ai",
+  "version": "1.0.0",
+  "private": true,
+  "description": "SpendWise AI (MoneyMate) - Personal Finance & AI Advisory Dashboard",
+  "scripts": {
+    "dev": "npm --prefix src/frontend run dev",
+    "build": "npm --prefix src/frontend run build",
+    "preview": "npm --prefix src/frontend run preview"
+  }
+}
