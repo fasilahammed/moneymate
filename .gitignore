@@ -1,0 +1,77 @@
+# ==============================================================================
+# MoneyMate Master .gitignore
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# 1. .NET Test Results, Runners & Coverage (test files ignore)
+# ------------------------------------------------------------------------------
+[Tt]est[Rr]esults/
+[Tt]est[Rr]esult*/
+**/[Tt]est[Rr]esults/
+*.trx
+*.coverage
+*.coveragexml
+*.cobertura.xml
+coverage/
+.nyc_output/
+
+# ------------------------------------------------------------------------------
+# 2. .NET Build Output & Intermediate Files
+# ------------------------------------------------------------------------------
+**/[Bb]in/
+**/[Oo]bj/
+**/bin/
+**/obj/
+[Bb]in/
+[Oo]bj/
+
+# Visual Studio & IDE Caches
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+.idea/
+*.DotSettings.user
+
+# NuGet & Packages
+*.nupkg
+packages/
+project.lock.json
+project.fragment.lock.json
+
+# ------------------------------------------------------------------------------
+# 3. Node.js & Frontend Artifacts
+# ------------------------------------------------------------------------------
+**/node_modules/
+**/dist/
+node_modules/
+dist/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.eslintcache
+.stylelintcache
+
+# Environment & Local Secrets
+.env
+.env.local
+.env.*.local
+appsettings.*.local.json
+
+# ------------------------------------------------------------------------------
+# 4. Database Files (SQL Server LocalDB)
+# ------------------------------------------------------------------------------
+*.mdf
+*.ldf
+*.ndf
+
+# ------------------------------------------------------------------------------
+# 5. OS & Temporary Files
+# ------------------------------------------------------------------------------
+*.log
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.DS_Store

@@ -1,4 +1,4 @@
-# SPENDWISE AI (MoneyMate) — Master Architecture & Implementation Plan
+# MONEYMATE — Master Architecture & Implementation Plan
 **Version:** 1.0.0 • **Status:** Approved Blueprint for Implementation • **Date:** October 2026  
 **Target Audience:** Salaried Individuals, Engineering Pair-Programming, Production Scaling
 
@@ -6,9 +6,9 @@
 
 ## 1. Executive Summary & Product Vision
 
-**SpendWise AI** (codenamed *MoneyMate*) is a next-generation personal finance and salary intelligence platform designed to eliminate the anxiety of "where did my paycheck go?". 
+**MoneyMate** is a next-generation personal finance and salary intelligence platform designed to eliminate the anxiety of "where did my paycheck go?". 
 
-Unlike traditional retrospective expense trackers that merely show graphs of money already lost, SpendWise AI acts as a **proactive financial copilot**:
+Unlike traditional retrospective expense trackers that merely show graphs of money already lost, MoneyMate acts as a **proactive financial copilot**:
 1. **Salary Ingestion & Rule-Based Allocation:** User defines their monthly take-home income (e.g., ₹25,000) and pay schedule.
 2. **Contextual Side-Panel Advisor:** Simultaneously provides smart allocation guidance (e.g., Food ₹4,000, Travel ₹2,500, Family ₹5,000, Savings ₹5,000, Fixed Bills ₹6,000, Buffer ₹2,500).
 3. **Frictionless Daily Expense Logging:** Every expense is logged with amount, category, payment mode, and note.

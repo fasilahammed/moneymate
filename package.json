@@ -1,8 +1,8 @@
 {
-  "name": "spendwise-ai",
+  "name": "moneymate",
   "version": "1.0.0",
   "private": true,
-  "description": "SpendWise AI (MoneyMate) - Personal Finance & AI Advisory Dashboard",
+  "description": "MoneyMate - Personal Finance & Real-Time Advisory Dashboard with .NET 9 Clean Architecture",
   "scripts": {
     "dev": "npm --prefix src/frontend run dev",
     "build": "npm --prefix src/frontend run build",

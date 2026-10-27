@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-  Sparkles,
   PlusCircle,
   Settings,
   RotateCcw,
@@ -40,16 +39,45 @@ export const Header: React.FC<HeaderProps> = ({
     <header className="navbar">
       {/* Brand */}
       <div className="brand-wrapper" onClick={() => onTabChange('dashboard')}>
-        <div className="brand-icon-box">
-          <Sparkles size={22} />
+        <div
+          className="brand-icon-box"
+          style={{
+            background: 'radial-gradient(circle, #FAF7F2 30%, #EAE0D0 100%)',
+            border: '1.5px solid rgba(212, 162, 55, 0.5)',
+            boxShadow: '0 4px 14px rgba(212, 162, 55, 0.3)',
+            padding: 2,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderRadius: 12,
+            overflow: 'hidden'
+          }}
+        >
+          <img
+            src="/favicon-mark.png"
+            alt="MoneyMate Logo Mark"
+            style={{ width: 30, height: 30, objectFit: 'contain' }}
+          />
         </div>
         <div>
-          <div style={{ display: 'flex', alignItems: 'center' }}>
-            <span className="brand-title">SpendWise AI</span>
-            <span className="brand-tag">Copilot v1.0</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <span className="brand-title" style={{ letterSpacing: '-0.03em', fontWeight: 800 }}>
+              money<span style={{ color: '#D4A237' }}>mate</span>
+            </span>
+            <span
+              className="brand-tag"
+              style={{
+                background: 'rgba(212, 162, 55, 0.15)',
+                color: '#D4A237',
+                borderColor: 'rgba(212, 162, 55, 0.35)',
+                fontWeight: 600
+              }}
+            >
+              .NET 9 Clean Arch
+            </span>
           </div>
           <div style={{ fontSize: '0.72rem', color: 'var(--text-dim)' }}>
-            Smart Salary & Real-Time Financial Advisory
+            Smart Salary, Real-Time Advisory & Expense Ledger
           </div>
         </div>
       </div>

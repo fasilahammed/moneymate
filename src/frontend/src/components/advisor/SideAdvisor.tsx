@@ -18,6 +18,7 @@ import type {
   SalaryProfile
 } from '../../types';
 import { answerAdvisorQuery } from '../../data/financialEngine';
+import { moneyMateApi } from '../../api/moneyMateApi';
 
 interface SideAdvisorProps {
   advisor: AdvisorRecommendation;
@@ -47,13 +48,13 @@ export const SideAdvisor: React.FC<SideAdvisorProps> = ({
   >([
     {
       sender: 'ai',
-      text: `Hello! I'm your SpendWise Copilot. Based on your ₹${salary.monthlyTakeHome.toLocaleString()} salary, your safe daily allowance is ₹${Math.round(metrics.dailyBurnRate)}/day. Ask me anytime before making a purchase!`,
+      text: `Hello! I'm your MoneyMate Copilot. Based on your ₹${salary.monthlyTakeHome.toLocaleString()} salary, your safe daily allowance is ₹${Math.round(metrics.dailyBurnRate)}/day. Ask me anytime before making a purchase!`,
       time: 'Just now'
     }
   ]);
   const [isTyping, setIsTyping] = useState(false);
 
-  const handleSendQuery = (queryText: string) => {
+  const handleSendQuery = async (queryText: string) => {
     if (!queryText.trim()) return;
 
     const userMsg = {
@@ -65,7 +66,19 @@ export const SideAdvisor: React.FC<SideAdvisorProps> = ({
     setChatInput('');
     setIsTyping(true);
 
-    setTimeout(() => {
+    try {
+      // Query the live ASP.NET Core backend API
+      const result = await moneyMateApi.askAdvisor(queryText);
+      setChatHistory((prev) => [
+        ...prev,
+        {
+          sender: 'ai' as const,
+          text: result.reply,
+          time: 'Now'
+        }
+      ]);
+    } catch {
+      // Graceful local engine fallback
       const response = answerAdvisorQuery(queryText, metrics, categoryStatuses);
       setChatHistory((prev) => [
         ...prev,
@@ -75,8 +88,9 @@ export const SideAdvisor: React.FC<SideAdvisorProps> = ({
           time: 'Now'
         }
       ]);
+    } finally {
       setIsTyping(false);
-    }, 350);
+    }
   };
 
   const handleChipClick = (sampleQuery: string) => {
@@ -129,7 +143,7 @@ export const SideAdvisor: React.FC<SideAdvisorProps> = ({
         <p className="advisor-recom-text">{advisor.adviceParagraph}</p>
       </div>
 
-      {/* Recommended Salary Allocation (User's Exact Requirement: Food, Travel, Family, Savings) */}
+      {/* Recommended Salary Allocation */}
       <div className="suggested-breakdown-box">
         <div className="suggested-header">
           <span>Target ₹{salary.monthlyTakeHome.toLocaleString()} Allocation Plan</span>
@@ -242,7 +256,7 @@ export const SideAdvisor: React.FC<SideAdvisorProps> = ({
           ))}
           {isTyping && (
             <div className="ai-response-bubble" style={{ color: 'var(--indigo-main)' }}>
-              Checking math against available balance...
+              Querying backend financial engine...
             </div>
           )}
         </div>
