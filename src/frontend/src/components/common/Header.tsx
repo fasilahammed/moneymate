@@ -1,14 +1,15 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   PlusCircle,
   Settings,
   RotateCcw,
-  Wallet,
   Sun,
   Moon,
   LayoutDashboard,
   PieChart,
-  Receipt
+  Receipt,
+  ChevronDown,
+  Check
 } from 'lucide-react';
 import type { SalaryProfile } from '../../types';
 
@@ -23,6 +24,7 @@ interface HeaderProps {
   onOpenAddExpense: () => void;
   onOpenSalaryModal: () => void;
   onResetDemo: () => void;
+  isBackendConnected?: boolean;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -35,63 +37,58 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenSalaryModal,
   onResetDemo
 }) => {
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown on click outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsProfileOpen(false);
+      }
+    };
+    if (isProfileOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isProfileOpen]);
+
   return (
     <header className="navbar">
-      {/* Brand */}
+      {/* 1. Brand Logo & Title */}
       <div className="brand-wrapper" onClick={() => onTabChange('dashboard')}>
-        <div
-          className="brand-icon-box"
-          style={{
-            background: 'radial-gradient(circle, #FAF7F2 30%, #EAE0D0 100%)',
-            border: '1.5px solid rgba(212, 162, 55, 0.5)',
-            boxShadow: '0 4px 14px rgba(212, 162, 55, 0.3)',
-            padding: 2,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            borderRadius: 12,
-            overflow: 'hidden'
-          }}
-        >
+        <div className="brand-icon-box">
           <img
             src="/favicon-mark.png"
             alt="MoneyMate Logo Mark"
-            style={{ width: 30, height: 30, objectFit: 'contain' }}
+            style={{ width: 28, height: 28, objectFit: 'contain' }}
           />
         </div>
-        <div>
+        <div className="brand-text-block">
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
             <span className="brand-title" style={{ letterSpacing: '-0.03em', fontWeight: 800 }}>
-              money<span style={{ color: '#D4A237' }}>mate</span>
-            </span>
-            <span
-              className="brand-tag"
-              style={{
-                background: 'rgba(212, 162, 55, 0.15)',
-                color: '#D4A237',
-                borderColor: 'rgba(212, 162, 55, 0.35)',
-                fontWeight: 600
-              }}
-            >
-              .NET 9 Clean Arch
+              Money<span style={{ color: '#D4A237' }}>Mate</span>
             </span>
           </div>
-          <div style={{ fontSize: '0.72rem', color: 'var(--text-dim)' }}>
+          <div className="brand-tagline">
             Smart Salary, Real-Time Advisory & Expense Ledger
           </div>
         </div>
       </div>
 
-      {/* Navigation Tabs (Dashboard, Monthly Diagrams, Ledger) */}
+      {/* 2. Dynamic Center Navigation Tabs */}
       <div className="nav-page-tabs">
         <button
           id="tab-dashboard"
           className={`nav-tab-btn ${activeTab === 'dashboard' ? 'active' : ''}`}
           onClick={() => onTabChange('dashboard')}
           type="button"
+          title="Dashboard"
         >
-          <LayoutDashboard size={15} />
-          <span>Dashboard</span>
+          <LayoutDashboard size={16} />
+          <span className="nav-tab-label">Dashboard</span>
         </button>
 
         <button
@@ -99,9 +96,10 @@ export const Header: React.FC<HeaderProps> = ({
           className={`nav-tab-btn ${activeTab === 'analytics' ? 'active' : ''}`}
           onClick={() => onTabChange('analytics')}
           type="button"
+          title="Monthly Diagrams"
         >
-          <PieChart size={15} />
-          <span>Monthly Diagrams</span>
+          <PieChart size={16} />
+          <span className="nav-tab-label">Monthly Diagrams</span>
         </button>
 
         <button
@@ -109,67 +107,136 @@ export const Header: React.FC<HeaderProps> = ({
           className={`nav-tab-btn ${activeTab === 'transactions' ? 'active' : ''}`}
           onClick={() => onTabChange('transactions')}
           type="button"
+          title="Ledger"
         >
-          <Receipt size={15} />
-          <span>Ledger</span>
+          <Receipt size={16} />
+          <span className="nav-tab-label">Ledger</span>
         </button>
       </div>
 
-      {/* Right Controls */}
-      <div className="nav-actions">
-        {/* Dark / Light Mode Toggle Button */}
-        <button
-          id="btn-toggle-theme"
-          className="theme-toggle-btn"
-          onClick={onToggleTheme}
-          title={`Switch to ${currentTheme === 'dark' ? 'Light' : 'Dark'} Mode`}
-          type="button"
-        >
-          {currentTheme === 'dark' ? (
-            <Sun size={19} color="var(--amber-light)" />
-          ) : (
-            <Moon size={19} color="var(--indigo-main)" />
-          )}
-        </button>
-
-        {/* Salary Status Pill */}
-        <div
-          id="btn-salary-pill"
-          className="salary-pill"
-          onClick={onOpenSalaryModal}
-          title="Click to edit salary or pay cycle"
-        >
-          <Wallet size={16} color="var(--emerald-main)" />
-          <span style={{ color: 'var(--text-muted)' }}>Salary:</span>
-          <span className="salary-amount-highlight">
-            {salary.currency}{salary.monthlyTakeHome.toLocaleString()}
-          </span>
-          <Settings size={13} color="var(--text-dim)" style={{ marginLeft: 2 }} />
-        </div>
-
-        {/* Reset Demo State Button */}
-        <button
-          id="btn-reset-demo"
-          className="btn-secondary"
-          onClick={onResetDemo}
-          title="Reset to default ₹25,000 blueprint data"
-          style={{ padding: '8px 12px', fontSize: '0.8rem' }}
-          type="button"
-        >
-          <RotateCcw size={14} />
-          <span>Reset</span>
-        </button>
-
-        {/* Add Expense Action Button */}
+      {/* 3. Simplified & Responsive Right Controls */}
+      <div className="nav-actions" ref={dropdownRef}>
+        {/* Quick Log Expense CTA */}
         <button
           id="btn-quick-add-expense"
           className="btn-primary"
           onClick={onOpenAddExpense}
           type="button"
         >
-          <PlusCircle size={18} />
-          <span>Log Expense</span>
+          <PlusCircle size={16} />
+          <span className="btn-label">Log Expense</span>
         </button>
+
+        {/* Profile Dropdown Trigger */}
+        <button
+          id="btn-profile-dropdown"
+          className={`profile-avatar-trigger ${isProfileOpen ? 'active' : ''}`}
+          onClick={() => setIsProfileOpen((prev) => !prev)}
+          type="button"
+          aria-expanded={isProfileOpen}
+          aria-label="User profile and settings menu"
+        >
+          <div className="profile-avatar-circle">
+            FA
+            <span className="profile-status-dot" />
+          </div>
+
+          <div className="profile-trigger-info">
+            <span className="profile-user-name">Fasil Ahammed</span>
+            <span className="profile-user-salary">
+              {salary.currency}{salary.monthlyTakeHome.toLocaleString()}
+            </span>
+          </div>
+
+          <ChevronDown
+            size={14}
+            className={`profile-chevron ${isProfileOpen ? 'rotated' : ''}`}
+          />
+        </button>
+
+        {/* 4. Elegant Profile Dropdown Menu (Normal & Solid Opaque) */}
+        {isProfileOpen && (
+          <div className="profile-dropdown-menu" id="profile-dropdown-menu">
+            {/* User Account Info Header */}
+            <div className="dropdown-user-header">
+              <div className="dropdown-avatar">FA</div>
+              <div className="dropdown-user-details">
+                <div className="dropdown-user-name">Fasil Ahammed</div>
+                <div className="dropdown-user-email">fasil@moneymate.local</div>
+                <div className="dropdown-user-status">
+                  <span className="status-dot-active" />
+                  <span>Personal Account • Live Synced</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Salary Card Inside Dropdown */}
+            <div className="dropdown-salary-section">
+              <div className="dropdown-salary-card">
+                <div>
+                  <div className="dropdown-salary-label">Monthly Salary</div>
+                  <div className="dropdown-salary-amount">
+                    {salary.currency}{salary.monthlyTakeHome.toLocaleString()}
+                  </div>
+                  <div className="dropdown-salary-sub">Payday: Day {salary.paydayDay} of month</div>
+                </div>
+
+                <button
+                  id="btn-edit-salary-dropdown"
+                  type="button"
+                  onClick={() => {
+                    setIsProfileOpen(false);
+                    onOpenSalaryModal();
+                  }}
+                  className="dropdown-change-btn"
+                >
+                  <Settings size={13} />
+                  <span>Change</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Actions Inside Dropdown */}
+            <div className="dropdown-actions-section">
+              {/* Appearance Toggle */}
+              <div className="dropdown-menu-row">
+                <div className="dropdown-row-label">
+                  {currentTheme === 'dark' ? <Moon size={16} /> : <Sun size={16} />}
+                  <span>Appearance</span>
+                </div>
+                <button
+                  id="btn-theme-toggle-dropdown"
+                  type="button"
+                  onClick={onToggleTheme}
+                  className="dropdown-theme-pill"
+                >
+                  <span>{currentTheme === 'dark' ? 'Dark Obsidian' : 'Light Crystal'}</span>
+                  <Check size={12} color="var(--emerald-main)" />
+                </button>
+              </div>
+
+              {/* Reset to ₹25,000 Demo Data */}
+              <button
+                id="btn-reset-demo-dropdown"
+                type="button"
+                onClick={() => {
+                  setIsProfileOpen(false);
+                  onResetDemo();
+                }}
+                className="dropdown-reset-btn"
+              >
+                <RotateCcw size={15} />
+                <span>Reset to Default ₹25,000</span>
+              </button>
+            </div>
+
+            {/* Dropdown Footer */}
+            <div className="dropdown-footer">
+              <span>MoneyMate v1.0</span>
+              <span>All Calculations Synced</span>
+            </div>
+          </div>
+        )}
       </div>
     </header>
   );

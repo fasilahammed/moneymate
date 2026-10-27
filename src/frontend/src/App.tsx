@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
-import { Plus, Database } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import {
   INITIAL_SALARY,
   INITIAL_CATEGORIES,
@@ -7,7 +7,17 @@ import {
   INITIAL_SAVINGS_GOALS,
   calculateFinancials
 } from './data/financialEngine';
-import type { SalaryProfile, Category, Transaction, SavingsGoal, PaymentMethod } from './types';
+import type {
+  SalaryProfile,
+  Category,
+  Transaction,
+  SavingsGoal,
+  PaymentMethod,
+  DashboardMetrics,
+  CategoryStatus,
+  AlertItem as FinancialAlert,
+  AdvisorRecommendation
+} from './types';
 import {
   Header,
   SummaryCards,
@@ -40,6 +50,16 @@ export const App: React.FC = () => {
   const [savingsGoals, setSavingsGoals] = useState<SavingsGoal[]>(INITIAL_SAVINGS_GOALS);
   const [dismissedAlertIds, setDismissedAlertIds] = useState<string[]>([]);
 
+  // Backend-Computed Deterministic States (Calculations handled strictly by .NET Backend)
+  const initialCalculations = useMemo(
+    () => calculateFinancials(INITIAL_SALARY, INITIAL_CATEGORIES, INITIAL_TRANSACTIONS, INITIAL_SAVINGS_GOALS),
+    []
+  );
+  const [metrics, setMetrics] = useState<DashboardMetrics>(initialCalculations.metrics);
+  const [categoryStatuses, setCategoryStatuses] = useState<CategoryStatus[]>(initialCalculations.categoryStatuses);
+  const [backendAlerts, setBackendAlerts] = useState<FinancialAlert[]>(initialCalculations.alerts);
+  const [advisor, setAdvisor] = useState<AdvisorRecommendation>(initialCalculations.advisor);
+
   // Modal Visibility
   const [isAddExpenseOpen, setIsAddExpenseOpen] = useState(false);
   const [isSalaryModalOpen, setIsSalaryModalOpen] = useState(false);
@@ -53,21 +73,39 @@ export const App: React.FC = () => {
     setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
   };
 
-  // Fetch from live backend on mount
+  // Sync all calculations, categories, salary profile, and ledger from backend
   const syncWithBackend = useCallback(async () => {
     try {
-      const [dashData, txList] = await Promise.all([
+      const [dashData, txList, salProfile] = await Promise.all([
         moneyMateApi.getDashboardSummary(),
-        moneyMateApi.getTransactions()
+        moneyMateApi.getTransactions(),
+        moneyMateApi.getSalaryProfile()
       ]);
 
-      if (dashData && txList) {
+      if (dashData) {
+        // Backend handles all business math and deterministic allocations
+        setMetrics(dashData.metrics);
+        setCategoryStatuses(dashData.categoryStatuses);
+        setBackendAlerts(dashData.alerts);
+        setAdvisor(dashData.advisor);
         setCategories(dashData.categoryStatuses.map((cs) => cs.category));
-        setTransactions(txList);
-        setIsBackendConnected(true);
       }
-    } catch {
-      // Offline fallback: keep local initial data
+
+      if (txList) {
+        setTransactions(txList);
+      }
+
+      if (salProfile) {
+        setSalary((prev) => ({
+          ...prev,
+          monthlyTakeHome: salProfile.monthlyTakeHome,
+          paydayDay: salProfile.paydayDayOfMonth
+        }));
+      }
+
+      setIsBackendConnected(true);
+    } catch (err) {
+      console.warn('Backend sync error, running in offline fallback mode:', err);
       setIsBackendConnected(false);
     }
   }, []);
@@ -76,17 +114,12 @@ export const App: React.FC = () => {
     syncWithBackend();
   }, [syncWithBackend]);
 
-  // Recalculate deterministic financials in real-time
-  const { metrics, categoryStatuses, alerts, advisor } = useMemo(() => {
-    return calculateFinancials(salary, categories, transactions, savingsGoals);
-  }, [salary, categories, transactions, savingsGoals]);
-
-  // Active Alerts
+  // Active Alerts filtered by user dismissals
   const activeAlerts = useMemo(() => {
-    return alerts.filter((a) => !dismissedAlertIds.includes(a.id));
-  }, [alerts, dismissedAlertIds]);
+    return backendAlerts.filter((a) => !dismissedAlertIds.includes(a.id));
+  }, [backendAlerts, dismissedAlertIds]);
 
-  // Handlers with Live Persistence
+  // Handlers with Live Backend Recalculation
   const handleAddTransaction = async (newTxData: {
     amount: number;
     categoryId: string;
@@ -95,73 +128,58 @@ export const App: React.FC = () => {
     note: string;
     date: string;
   }) => {
-    // 1. Optimistic UI update
-    const tempId = `tx-${Date.now()}`;
-    const optimisticTx: Transaction = {
-      id: tempId,
-      ...newTxData
-    };
-    setTransactions((prev) => [optimisticTx, ...prev]);
-
-    // 2. Persist to SQL Server via API
     try {
-      const persistedTx = await moneyMateApi.createTransaction(newTxData);
-      setTransactions((prev) =>
-        prev.map((t) => (t.id === tempId ? persistedTx : t))
-      );
+      await moneyMateApi.createTransaction(newTxData);
+      // Immediately refresh calculations and state from backend
+      await syncWithBackend();
       setIsBackendConnected(true);
-    } catch {
-      // Keep optimistic entry locally
+    } catch (err) {
+      console.error('Failed to persist transaction to backend:', err);
     }
   };
 
   const handleDeleteTransaction = async (id: string) => {
-    // 1. Optimistic removal
-    setTransactions((prev) => prev.filter((tx) => tx.id !== id));
-
-    // 2. Persist deletion to SQL Server
     try {
       await moneyMateApi.deleteTransaction(id);
+      // Immediately refresh calculations and state from backend
+      await syncWithBackend();
       setIsBackendConnected(true);
-    } catch {
-      // Kept removed in UI
+    } catch (err) {
+      console.error('Failed to delete transaction from backend:', err);
     }
   };
 
   const handleUpdateSalary = async (newSalary: SalaryProfile) => {
-    const ratio = newSalary.monthlyTakeHome / salary.monthlyTakeHome;
-    const scaledCategories = categories.map((cat) => ({
-      ...cat,
-      allocatedAmount: Math.round(cat.allocatedAmount * ratio)
-    }));
-    const scaledGoals = savingsGoals.map((g) => ({
-      ...g,
-      monthlyCommitment: Math.round(g.monthlyCommitment * ratio)
-    }));
-
-    setSalary(newSalary);
-    setCategories(scaledCategories);
-    setSavingsGoals(scaledGoals);
-
-    // Persist to backend
     try {
+      // 1. Send new salary to backend
       await moneyMateApi.updateSalary({
         monthlyTakeHome: newSalary.monthlyTakeHome,
         paydayDayOfMonth: newSalary.paydayDay
       });
+
+      // 2. Fetch fresh backend calculations (which scaled all categories, safe balances, daily pace)
+      await syncWithBackend();
       setIsBackendConnected(true);
-    } catch {
-      // Local state kept
+    } catch (err) {
+      console.error('Failed to update salary in backend:', err);
     }
   };
 
-  const handleResetDemo = () => {
-    setSalary(INITIAL_SALARY);
-    setCategories(INITIAL_CATEGORIES);
-    setTransactions(INITIAL_TRANSACTIONS);
-    setSavingsGoals(INITIAL_SAVINGS_GOALS);
-    setDismissedAlertIds([]);
-    syncWithBackend();
+  const handleResetDemo = async () => {
+    try {
+      await moneyMateApi.updateSalary({
+        monthlyTakeHome: 25000,
+        paydayDayOfMonth: 1
+      });
+      setDismissedAlertIds([]);
+      await syncWithBackend();
+    } catch {
+      setSalary(INITIAL_SALARY);
+      setCategories(INITIAL_CATEGORIES);
+      setTransactions(INITIAL_TRANSACTIONS);
+      setSavingsGoals(INITIAL_SAVINGS_GOALS);
+      setDismissedAlertIds([]);
+    }
   };
 
   const handleDismissAlert = (id: string) => {
@@ -180,30 +198,10 @@ export const App: React.FC = () => {
         onOpenAddExpense={() => setIsAddExpenseOpen(true)}
         onOpenSalaryModal={() => setIsSalaryModalOpen(true)}
         onResetDemo={handleResetDemo}
+        isBackendConnected={isBackendConnected}
       />
 
       <main className="main-content">
-        {/* Backend Connectivity Status Badge */}
-        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '12px' }}>
-          <div
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px',
-              fontSize: '0.73rem',
-              padding: '3px 10px',
-              borderRadius: '20px',
-              background: isBackendConnected ? 'rgba(16, 185, 129, 0.12)' : 'rgba(245, 158, 11, 0.12)',
-              border: `1px solid ${isBackendConnected ? 'rgba(16, 185, 129, 0.3)' : 'rgba(245, 158, 11, 0.3)'}`,
-              color: isBackendConnected ? 'var(--emerald-main)' : 'var(--amber-main)',
-              fontWeight: 600
-            }}
-          >
-            <Database size={13} />
-            <span>{isBackendConnected ? 'Connected to .NET 9 API & SQL Server' : 'Local Storage Mode'}</span>
-          </div>
-        </div>
-
         {/* Persistent Top Executive Metrics */}
         <SummaryCards metrics={metrics} salary={salary} />
 

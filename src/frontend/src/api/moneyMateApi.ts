@@ -122,6 +122,18 @@ export const moneyMateApi = {
     }
   },
 
+  async getSalaryProfile(): Promise<{ monthlyTakeHome: number; paydayDayOfMonth: number }> {
+    const res = await fetch(`${API_BASE_URL}/salary-profile`);
+    if (!res.ok) {
+      throw new Error(`Failed to fetch salary: ${res.statusText}`);
+    }
+    const data = await res.json();
+    return {
+      monthlyTakeHome: Number(data.monthlyTakeHome),
+      paydayDayOfMonth: Number(data.paydayDayOfMonth)
+    };
+  },
+
   async updateSalary(salary: { monthlyTakeHome: number; paydayDayOfMonth: number }): Promise<void> {
     const res = await fetch(`${API_BASE_URL}/salary-profile`, {
       method: 'PUT',

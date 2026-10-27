@@ -304,7 +304,51 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--amber-light);
 }
 
-/* Salary Pill in Header */
+/* Profile Avatar Trigger in Header */
+.profile-avatar-trigger {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 12px 5px 6px;
+  background: var(--pill-bg);
+  border: 1px solid var(--border-subtle);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  color: var(--text-bright);
+}
+
+.profile-avatar-trigger:hover {
+  background: var(--bg-card-hover);
+  border-color: rgba(212, 162, 55, 0.4);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+}
+
+.profile-avatar-trigger:focus-visible {
+  outline: 2px solid #D4A237;
+  outline-offset: 2px;
+}
+
+/* Profile Dropdown Menu */
+.profile-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: 0;
+  width: 320px;
+  max-width: calc(100vw - 24px);
+  background: var(--bg-card-solid);
+  border: 1px solid var(--border-subtle);
+  border-radius: 18px;
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  z-index: 1000;
+  overflow: hidden;
+  animation: dropdownFadeIn 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Salary Pill in Header (Inside dropdown or legacy) */
 .salary-pill {
   display: flex;
   align-items: center;
@@ -1305,3 +1349,107 @@ h1, h2, h3, h4, h5, h6 {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.6; }
 }
+
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ==========================================================================
+   Responsive Viewports & Mobile Refinements
+   ========================================================================== */
+@media (max-width: 900px) {
+  .navbar {
+    padding: 12px 18px;
+  }
+
+  .nav-page-tabs {
+    gap: 2px;
+  }
+
+  .nav-tab-btn {
+    padding: 6px 12px;
+    font-size: 0.8rem;
+  }
+
+  .dashboard-columns {
+    grid-template-columns: 1fr;
+  }
+
+  .summary-cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 680px) {
+  .navbar {
+    padding: 10px 14px;
+    gap: 8px;
+  }
+
+  .brand-wrapper .brand-tag,
+  .brand-wrapper div > div:nth-child(2) {
+    display: none;
+  }
+
+  .profile-trigger-info {
+    display: none !important;
+  }
+
+  .profile-avatar-trigger {
+    padding: 4px;
+    border-radius: 50%;
+  }
+
+  .profile-avatar-trigger svg {
+    display: none;
+  }
+
+  .nav-page-tabs {
+    overflow-x: auto;
+    max-width: 170px;
+    scrollbar-width: none;
+  }
+
+  .nav-page-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .nav-tab-btn span {
+    display: none;
+  }
+
+  .nav-tab-btn {
+    padding: 7px 10px;
+  }
+
+  #btn-quick-add-expense span {
+    display: none;
+  }
+
+  #btn-quick-add-expense {
+    padding: 8px 10px;
+    border-radius: 10px;
+  }
+
+  .profile-dropdown-menu {
+    width: 290px;
+    right: 0;
+  }
+
+  .summary-cards-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .category-grid {
+    grid-template-columns: 1fr;
+  }
+}
+

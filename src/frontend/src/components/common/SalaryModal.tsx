@@ -18,6 +18,13 @@ export const SalaryModal: React.FC<SalaryModalProps> = ({
   const [takeHome, setTakeHome] = useState(salary.monthlyTakeHome.toString());
   const [payday, setPayday] = useState(salary.paydayDay.toString());
 
+  React.useEffect(() => {
+    if (isOpen) {
+      setTakeHome(salary.monthlyTakeHome.toString());
+      setPayday(salary.paydayDay.toString());
+    }
+  }, [isOpen, salary.monthlyTakeHome, salary.paydayDay]);
+
   if (!isOpen) return null;
 
   const handleSubmit = (e: React.FormEvent) => {
