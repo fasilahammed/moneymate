@@ -1,4 +1,5 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
+import { Plus } from 'lucide-react';
 import {
   INITIAL_SALARY,
   INITIAL_CATEGORIES,
@@ -8,6 +9,7 @@ import {
 } from './data/financialEngine';
 import type { SalaryProfile, Category, Transaction, SavingsGoal, PaymentMethod } from './types';
 import { Header } from './components/Header';
+import type { ActiveTab } from './components/Header';
 import { SummaryCards } from './components/SummaryCards';
 import { AlertBanners } from './components/AlertBanners';
 import { CategoryGrid } from './components/CategoryGrid';
@@ -16,9 +18,16 @@ import { TransactionList } from './components/TransactionList';
 import { SavingsGoalCard } from './components/SavingsGoalCard';
 import { AddTransactionModal } from './components/AddTransactionModal';
 import { SalaryModal } from './components/SalaryModal';
+import { AnalyticsPage } from './components/AnalyticsPage';
 
 export const App: React.FC = () => {
-  // App State
+  // Theme State (Dark & Light Mode)
+  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
+
+  // Navigation Tab State
+  const [activeTab, setActiveTab] = useState<ActiveTab>('dashboard');
+
+  // Financial App State
   const [salary, setSalary] = useState<SalaryProfile>(INITIAL_SALARY);
   const [categories, setCategories] = useState<Category[]>(INITIAL_CATEGORIES);
   const [transactions, setTransactions] = useState<Transaction[]>(INITIAL_TRANSACTIONS);
@@ -29,12 +38,21 @@ export const App: React.FC = () => {
   const [isAddExpenseOpen, setIsAddExpenseOpen] = useState(false);
   const [isSalaryModalOpen, setIsSalaryModalOpen] = useState(false);
 
+  // Sync theme to root DOM
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
+  };
+
   // Recalculate deterministic financials in real-time
   const { metrics, categoryStatuses, alerts, advisor } = useMemo(() => {
     return calculateFinancials(salary, categories, transactions, savingsGoals);
   }, [salary, categories, transactions, savingsGoals]);
 
-  // Filter out dismissed alerts
+  // Active Alerts
   const activeAlerts = useMemo(() => {
     return alerts.filter((a) => !dismissedAlertIds.includes(a.id));
   }, [alerts, dismissedAlertIds]);
@@ -60,7 +78,6 @@ export const App: React.FC = () => {
   };
 
   const handleUpdateSalary = (newSalary: SalaryProfile) => {
-    // If salary changed, scale recommended category allocations proportionally
     const ratio = newSalary.monthlyTakeHome / salary.monthlyTakeHome;
     const scaledCategories = categories.map((cat) => ({
       ...cat,
@@ -90,42 +107,78 @@ export const App: React.FC = () => {
 
   return (
     <div className="app-layout">
-      {/* 1. Header Navigation */}
+      {/* 1. Header with Page Tabs & Dark/Light Theme Switcher */}
       <Header
         salary={salary}
+        currentTheme={theme}
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        onToggleTheme={toggleTheme}
         onOpenAddExpense={() => setIsAddExpenseOpen(true)}
         onOpenSalaryModal={() => setIsSalaryModalOpen(true)}
         onResetDemo={handleResetDemo}
       />
 
       <main className="main-content">
-        {/* 2. Top Executive Summary Metric Cards */}
+        {/* Top Executive Summary Metric Cards (Available on all pages for persistent context) */}
         <SummaryCards metrics={metrics} salary={salary} />
 
-        {/* 3. Real-Time Overspending & Pace Alert Banners */}
+        {/* Real-Time Compact Alert Notification Bar */}
         <AlertBanners alerts={activeAlerts} onDismissAlert={handleDismissAlert} />
 
-        {/* 4. Two-Column Dashboard Layout: Left Content + Right Side Advisor */}
-        <div className="dashboard-columns">
-          {/* LEFT MAIN COLUMN */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
-            {/* Category Budgets & Consumption Progress */}
-            <CategoryGrid
+        {/* TAB 1: MAIN DASHBOARD */}
+        {activeTab === 'dashboard' && (
+          <div className="dashboard-columns">
+            {/* LEFT MAIN COLUMN */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
+              {/* Category Budgets & Live Tracking Progress */}
+              <CategoryGrid
+                categoryStatuses={categoryStatuses}
+                salary={salary}
+                onSelectCategory={() => setIsAddExpenseOpen(true)}
+              />
+
+              {/* Savings Goal Status */}
+              {savingsGoals.length > 0 && (
+                <SavingsGoalCard
+                  goal={savingsGoals[0]}
+                  salary={salary}
+                  metrics={metrics}
+                />
+              )}
+
+              {/* Recent Transactions Ledger */}
+              <TransactionList
+                transactions={transactions}
+                categories={categories}
+                salary={salary}
+                onDeleteTransaction={handleDeleteTransaction}
+              />
+            </div>
+
+            {/* RIGHT SIDE ADVISOR COLUMN (User's Core Requirement) */}
+            <SideAdvisor
+              advisor={advisor}
+              metrics={metrics}
               categoryStatuses={categoryStatuses}
               salary={salary}
-              onSelectCategory={() => setIsAddExpenseOpen(true)}
             />
+          </div>
+        )}
 
-            {/* Savings Goal Progress */}
-            {savingsGoals.length > 0 && (
-              <SavingsGoalCard
-                goal={savingsGoals[0]}
-                salary={salary}
-                metrics={metrics}
-              />
-            )}
+        {/* TAB 2: MONTHLY EXPENSE DIAGRAMS & ANALYTICS */}
+        {activeTab === 'analytics' && (
+          <AnalyticsPage
+            salary={salary}
+            metrics={metrics}
+            categoryStatuses={categoryStatuses}
+            transactions={transactions}
+          />
+        )}
 
-            {/* Expense & Inflow Ledger */}
+        {/* TAB 3: FULL TRANSACTIONS LEDGER */}
+        {activeTab === 'transactions' && (
+          <div style={{ animation: 'fadeIn 0.3s ease' }}>
             <TransactionList
               transactions={transactions}
               categories={categories}
@@ -133,16 +186,20 @@ export const App: React.FC = () => {
               onDeleteTransaction={handleDeleteTransaction}
             />
           </div>
-
-          {/* RIGHT SIDE ADVISOR COLUMN (User's Core Requirement) */}
-          <SideAdvisor
-            advisor={advisor}
-            metrics={metrics}
-            categoryStatuses={categoryStatuses}
-            salary={salary}
-          />
-        </div>
+        )}
       </main>
+
+      {/* FLOATING ACTION BUTTON (FAB) '+' TO QUICK ADD NEW EXPENSE */}
+      <button
+        id="fab-add-expense"
+        className="fab-add-expense"
+        onClick={() => setIsAddExpenseOpen(true)}
+        title="Quick Log Expense (+)"
+        type="button"
+      >
+        <div className="fab-pulse-ring" />
+        <Plus size={28} strokeWidth={2.8} />
+      </button>
 
       {/* MODALS */}
       <AddTransactionModal
