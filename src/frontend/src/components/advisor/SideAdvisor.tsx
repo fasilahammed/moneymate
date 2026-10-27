@@ -16,8 +16,8 @@ import type {
   DashboardMetrics,
   CategoryStatus,
   SalaryProfile
-} from '../types';
-import { answerAdvisorQuery } from '../data/financialEngine';
+} from '../../types';
+import { answerAdvisorQuery } from '../../data/financialEngine';
 
 interface SideAdvisorProps {
   advisor: AdvisorRecommendation;
@@ -83,17 +83,16 @@ export const SideAdvisor: React.FC<SideAdvisorProps> = ({
     handleSendQuery(sampleQuery);
   };
 
-  // Color logic for health score
   const scoreColor =
     metrics.healthScore >= 80
-      ? 'var(--emerald-400)'
+      ? 'var(--emerald-main)'
       : metrics.healthScore >= 60
-      ? 'var(--amber-400)'
-      : 'var(--rose-400)';
+      ? 'var(--amber-main)'
+      : 'var(--rose-main)';
 
   return (
     <aside className="glass-panel side-advisor-panel" id="side-advisor-container">
-      {/* 1. Header with Copilot Badge and Financial Health Score */}
+      {/* Header with Copilot Badge and Financial Health Score */}
       <div className="advisor-top-badge">
         <div className="copilot-chip">
           <Sparkles size={14} />
@@ -110,31 +109,31 @@ export const SideAdvisor: React.FC<SideAdvisorProps> = ({
         </div>
       </div>
 
-      {/* 2. Contextual Dynamic Advisory Note */}
+      {/* Dynamic Advisory Note */}
       <div
         className="advisor-recommendation-box"
         style={{
           borderLeft: `4px solid ${
             advisor.status === 'ALERT'
-              ? 'var(--rose-400)'
+              ? 'var(--rose-main)'
               : advisor.status === 'CAUTION'
-              ? 'var(--amber-400)'
-              : 'var(--indigo-400)'
+              ? 'var(--amber-main)'
+              : 'var(--indigo-main)'
           }`
         }}
       >
         <div className="advisor-recom-title">
-          <Bot size={17} color="var(--indigo-400)" />
+          <Bot size={17} color="var(--indigo-main)" />
           <span>{advisor.headline}</span>
         </div>
         <p className="advisor-recom-text">{advisor.adviceParagraph}</p>
       </div>
 
-      {/* 3. Recommended Salary Allocation (User's Exact Requirement: Food, Travel, Family, Savings) */}
+      {/* Recommended Salary Allocation (User's Exact Requirement: Food, Travel, Family, Savings) */}
       <div className="suggested-breakdown-box">
         <div className="suggested-header">
           <span>Target ₹{salary.monthlyTakeHome.toLocaleString()} Allocation Plan</span>
-          <span style={{ fontSize: '0.72rem', color: 'var(--emerald-400)' }}>100% Balanced</span>
+          <span style={{ fontSize: '0.72rem', color: 'var(--emerald-main)' }}>100% Balanced</span>
         </div>
 
         <div>
@@ -155,7 +154,7 @@ export const SideAdvisor: React.FC<SideAdvisorProps> = ({
                       ({pct}%)
                     </span>
                   </div>
-                  <div style={{ fontSize: '0.7rem', color: cs.status === 'EXCEEDED' ? 'var(--rose-400)' : cs.status === 'WARNING' ? 'var(--amber-400)' : 'var(--text-dim)' }}>
+                  <div style={{ fontSize: '0.7rem', color: cs.status === 'EXCEEDED' ? 'var(--rose-main)' : cs.status === 'WARNING' ? 'var(--amber-main)' : 'var(--text-dim)' }}>
                     Spent: {salary.currency}{cs.spent.toLocaleString()}
                   </div>
                 </div>
@@ -165,10 +164,10 @@ export const SideAdvisor: React.FC<SideAdvisorProps> = ({
         </div>
       </div>
 
-      {/* 4. Interactive Ask Copilot Chat */}
+      {/* Ask Copilot Interactive Query Box */}
       <div className="copilot-chat-box">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.82rem', fontWeight: 600, color: '#e0e7ff' }}>
-          <HelpCircle size={15} color="var(--indigo-400)" />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.82rem', fontWeight: 600, color: 'var(--text-bright)' }}>
+          <HelpCircle size={15} color="var(--indigo-main)" />
           <span>Ask Before You Spend</span>
         </div>
 
@@ -204,10 +203,10 @@ export const SideAdvisor: React.FC<SideAdvisorProps> = ({
           </button>
         </div>
 
-        {/* Chat message display */}
+        {/* Chat message history display */}
         <div
           style={{
-            maxHeight: '190px',
+            maxHeight: '180px',
             overflowY: 'auto',
             display: 'flex',
             flexDirection: 'column',
@@ -226,12 +225,12 @@ export const SideAdvisor: React.FC<SideAdvisorProps> = ({
               {msg.sender === 'user' ? (
                 <div
                   style={{
-                    background: 'rgba(99, 102, 241, 0.25)',
+                    background: 'var(--indigo-glow)',
                     border: '1px solid rgba(99, 102, 241, 0.4)',
                     padding: '8px 12px',
                     borderRadius: '12px 12px 2px 12px',
                     fontSize: '0.8rem',
-                    color: '#ffffff'
+                    color: 'var(--text-bright)'
                   }}
                 >
                   {msg.text}
@@ -242,7 +241,7 @@ export const SideAdvisor: React.FC<SideAdvisorProps> = ({
             </div>
           ))}
           {isTyping && (
-            <div className="ai-response-bubble" style={{ color: 'var(--indigo-400)' }}>
+            <div className="ai-response-bubble" style={{ color: 'var(--indigo-main)' }}>
               Checking math against available balance...
             </div>
           )}

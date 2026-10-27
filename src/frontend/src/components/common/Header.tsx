@@ -11,7 +11,7 @@ import {
   PieChart,
   Receipt
 } from 'lucide-react';
-import type { SalaryProfile } from '../types';
+import type { SalaryProfile } from '../../types';
 
 export type ActiveTab = 'dashboard' | 'analytics' | 'transactions';
 
@@ -54,7 +54,7 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
       </div>
 
-      {/* Center Navigation Tabs (Dashboard, Monthly Diagrams, Transactions) */}
+      {/* Navigation Tabs (Dashboard, Monthly Diagrams, Ledger) */}
       <div className="nav-page-tabs">
         <button
           id="tab-dashboard"

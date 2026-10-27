@@ -1,6 +1,6 @@
 import React from 'react';
 import { ArrowDownLeft, ArrowUpRight, ShieldCheck, Banknote, Clock } from 'lucide-react';
-import type { DashboardMetrics, SalaryProfile } from '../types';
+import type { DashboardMetrics, SalaryProfile } from '../../types';
 
 interface SummaryCardsProps {
   metrics: DashboardMetrics;
@@ -17,7 +17,7 @@ export const SummaryCards: React.FC<SummaryCardsProps> = ({ metrics, salary }) =
         <div className="card-header-flex">
           <span className="card-label">Monthly Salary</span>
           <div className="card-icon-bubble">
-            <ArrowDownLeft size={18} color="var(--emerald-400)" />
+            <ArrowDownLeft size={18} color="var(--emerald-main)" />
           </div>
         </div>
         <div className="card-value">
@@ -33,10 +33,10 @@ export const SummaryCards: React.FC<SummaryCardsProps> = ({ metrics, salary }) =
         <div className="card-header-flex">
           <span className="card-label">Expenses Spent</span>
           <div className="card-icon-bubble">
-            <ArrowUpRight size={18} color="var(--rose-400)" />
+            <ArrowUpRight size={18} color="var(--rose-main)" />
           </div>
         </div>
-        <div className="card-value" style={{ color: 'var(--rose-400)' }}>
+        <div className="card-value" style={{ color: 'var(--rose-main)' }}>
           {salary.currency}{metrics.totalSpent.toLocaleString()}
         </div>
         <div className="card-subtext">
@@ -49,10 +49,10 @@ export const SummaryCards: React.FC<SummaryCardsProps> = ({ metrics, salary }) =
         <div className="card-header-flex">
           <span className="card-label">Locked Savings</span>
           <div className="card-icon-bubble">
-            <ShieldCheck size={18} color="var(--cyan-400)" />
+            <ShieldCheck size={18} color="var(--cyan-main)" />
           </div>
         </div>
-        <div className="card-value" style={{ color: 'var(--cyan-400)' }}>
+        <div className="card-value" style={{ color: 'var(--cyan-main)' }}>
           {salary.currency}{metrics.committedSavings.toLocaleString()}
         </div>
         <div className="card-subtext">
@@ -62,32 +62,29 @@ export const SummaryCards: React.FC<SummaryCardsProps> = ({ metrics, salary }) =
 
       {/* 4. Safe Available Balance (Real Spending Power) */}
       <div
-        className={`glass-panel summary-card balance ${isDeficit ? 'danger-pulse' : ''}`}
+        className="glass-panel summary-card balance"
         id="card-safe-balance"
         style={{
-          background: isDeficit
-            ? 'linear-gradient(135deg, rgba(244, 63, 94, 0.15), rgba(15, 23, 42, 0.8))'
-            : 'linear-gradient(135deg, rgba(16, 185, 129, 0.14), rgba(15, 23, 42, 0.8))',
           border: isDeficit
-            ? '1px solid rgba(244, 63, 94, 0.5)'
-            : '1px solid rgba(16, 185, 129, 0.4)'
+            ? '1px solid var(--rose-main)'
+            : '1px solid var(--emerald-main)'
         }}
       >
         <div className="card-header-flex">
-          <span className="card-label" style={{ color: isDeficit ? 'var(--rose-400)' : 'var(--emerald-400)', fontWeight: 700 }}>
+          <span className="card-label" style={{ color: isDeficit ? 'var(--rose-main)' : 'var(--emerald-main)', fontWeight: 700 }}>
             Safe Available Balance
           </span>
           <div className="card-icon-bubble">
-            <Banknote size={18} color={isDeficit ? 'var(--rose-400)' : 'var(--emerald-400)'} />
+            <Banknote size={18} color={isDeficit ? 'var(--rose-main)' : 'var(--emerald-main)'} />
           </div>
         </div>
         <div
           className="card-value"
           style={{
-            color: isDeficit ? 'var(--rose-400)' : 'var(--emerald-400)',
+            color: isDeficit ? 'var(--rose-main)' : 'var(--emerald-main)',
             textShadow: isDeficit
-              ? '0 0 20px rgba(244, 63, 94, 0.4)'
-              : '0 0 20px rgba(16, 185, 129, 0.4)'
+              ? '0 0 20px var(--rose-glow)'
+              : '0 0 20px var(--emerald-glow)'
           }}
         >
           {salary.currency}{metrics.safeAvailableBalance.toLocaleString()}
@@ -106,10 +103,10 @@ export const SummaryCards: React.FC<SummaryCardsProps> = ({ metrics, salary }) =
         <div className="card-header-flex">
           <span className="card-label">Safe Daily Pace</span>
           <div className="card-icon-bubble">
-            <Clock size={18} color="var(--indigo-400)" />
+            <Clock size={18} color="var(--indigo-main)" />
           </div>
         </div>
-        <div className="card-value" style={{ color: 'var(--indigo-400)' }}>
+        <div className="card-value" style={{ color: 'var(--indigo-main)' }}>
           {salary.currency}{Math.round(metrics.dailyBurnRate).toLocaleString()}
           <span style={{ fontSize: '0.9rem', color: 'var(--text-dim)', fontWeight: 400 }}> / day</span>
         </div>

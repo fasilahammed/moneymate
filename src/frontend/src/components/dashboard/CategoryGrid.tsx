@@ -8,7 +8,7 @@ import {
   ShoppingBag,
   Sparkles
 } from 'lucide-react';
-import type { CategoryStatus, SalaryProfile } from '../types';
+import type { CategoryStatus, SalaryProfile } from '../../types';
 
 interface CategoryGridProps {
   categoryStatuses: CategoryStatus[];
@@ -34,7 +34,7 @@ export const CategoryGrid: React.FC<CategoryGridProps> = ({
     <div>
       <div className="section-title-row">
         <h2 className="section-title">
-          <Sparkles size={20} color="var(--emerald-400)" />
+          <Sparkles size={20} color="var(--emerald-main)" />
           <span>Category Budgets & Live Tracking</span>
         </h2>
         <span style={{ fontSize: '0.82rem', color: 'var(--text-dim)' }}>
@@ -70,9 +70,9 @@ export const CategoryGrid: React.FC<CategoryGridProps> = ({
               onClick={() => onSelectCategory && onSelectCategory(cs.category.id)}
               style={{
                 borderColor: isExceeded
-                  ? 'rgba(244, 63, 94, 0.4)'
+                  ? 'var(--rose-main)'
                   : isWarning
-                  ? 'rgba(245, 158, 11, 0.35)'
+                  ? 'var(--amber-main)'
                   : undefined
               }}
             >
@@ -100,7 +100,7 @@ export const CategoryGrid: React.FC<CategoryGridProps> = ({
                 </div>
               </div>
 
-              {/* Visual Progress Bar */}
+              {/* Progress Bar */}
               <div className="progress-container">
                 <div className="progress-track">
                   <div
@@ -113,7 +113,7 @@ export const CategoryGrid: React.FC<CategoryGridProps> = ({
               {/* Financial Numbers Row */}
               <div className="cat-finance-row">
                 <div>
-                  <span className="cat-spent-strong" style={{ color: isExceeded ? 'var(--rose-400)' : 'var(--text-bright)' }}>
+                  <span className="cat-spent-strong" style={{ color: isExceeded ? 'var(--rose-main)' : 'var(--text-bright)' }}>
                     {salary.currency}{cs.spent.toLocaleString()}
                   </span>
                   <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)', marginLeft: '4px' }}>
@@ -122,7 +122,7 @@ export const CategoryGrid: React.FC<CategoryGridProps> = ({
                 </div>
                 <div className="cat-remain-muted">
                   {isExceeded ? (
-                    <span style={{ color: 'var(--rose-400)', fontWeight: 600 }}>
+                    <span style={{ color: 'var(--rose-main)', fontWeight: 600 }}>
                       - {salary.currency}{(cs.spent - cs.category.allocatedAmount).toLocaleString()} over
                     </span>
                   ) : (
@@ -141,12 +141,12 @@ export const CategoryGrid: React.FC<CategoryGridProps> = ({
                   marginTop: '8px',
                   display: 'flex',
                   justifyContent: 'space-between',
-                  borderTop: '1px solid rgba(255, 255, 255, 0.04)',
+                  borderTop: '1px solid var(--border-subtle)',
                   paddingTop: '6px'
                 }}
               >
                 <span>Daily allowance:</span>
-                <span style={{ color: isExceeded ? 'var(--rose-400)' : 'var(--text-muted)', fontWeight: 600 }}>
+                <span style={{ color: isExceeded ? 'var(--rose-main)' : 'var(--text-muted)', fontWeight: 600 }}>
                   {isExceeded ? '₹0 / day' : `₹${Math.round(cs.dailySafePace)} / day`}
                 </span>
               </div>

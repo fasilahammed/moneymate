@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Search, Filter, Trash2, Receipt } from 'lucide-react';
-import type { Transaction, Category, SalaryProfile } from '../types';
+import type { Transaction, Category, SalaryProfile } from '../../types';
 
 interface TransactionListProps {
   transactions: Transaction[];
@@ -34,7 +34,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
     <div className="glass-panel transactions-panel" id="transactions-section">
       <div className="section-title-row">
         <h2 className="section-title">
-          <Receipt size={20} color="var(--indigo-400)" />
+          <Receipt size={20} color="var(--indigo-main)" />
           <span>Expense & Inflow Ledger</span>
         </h2>
         <span style={{ fontSize: '0.82rem', color: 'var(--text-dim)' }}>
@@ -110,7 +110,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
                           alignItems: 'center',
                           gap: '6px',
                           background: `${cat?.colorHex || '#64748b'}20`,
-                          color: cat?.colorHex || '#ffffff',
+                          color: cat?.colorHex || 'var(--text-bright)',
                           padding: '3px 8px',
                           borderRadius: '6px',
                           fontSize: '0.78rem',
@@ -133,6 +133,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
                         className="delete-action-btn"
                         onClick={() => onDeleteTransaction(tx.id)}
                         title="Delete transaction and restore balance"
+                        type="button"
                       >
                         <Trash2 size={15} />
                       </button>

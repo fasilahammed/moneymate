@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { X, PlusCircle, AlertTriangle, CheckCircle } from 'lucide-react';
-import type { Category, PaymentMethod, SalaryProfile, DashboardMetrics, CategoryStatus } from '../types';
+import type { Category, PaymentMethod, SalaryProfile, DashboardMetrics, CategoryStatus } from '../../types';
 
 interface AddTransactionModalProps {
   isOpen: boolean;
@@ -70,10 +70,10 @@ export const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <div className="modal-title">
-            <PlusCircle size={22} color="var(--emerald-400)" />
+            <PlusCircle size={22} color="var(--emerald-main)" />
             <span>Log New Expense</span>
           </div>
-          <button className="modal-close-btn" onClick={onClose}>
+          <button className="modal-close-btn" onClick={onClose} type="button">
             <X size={18} />
           </button>
         </div>
@@ -117,7 +117,7 @@ export const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
             </select>
           </div>
 
-          {/* Real-Time Impact & Overspending Simulation Banner */}
+          {/* Real-Time Impact Simulation Banner */}
           {enteredAmount > 0 && targetCategoryStatus && (
             <div
               className={`preview-impact-box ${
@@ -125,9 +125,9 @@ export const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
               }`}
             >
               {isCategoryOverspent || isDeficitRisk ? (
-                <AlertTriangle size={18} color="var(--rose-400)" style={{ flexShrink: 0 }} />
+                <AlertTriangle size={18} color="var(--rose-main)" style={{ flexShrink: 0 }} />
               ) : (
-                <CheckCircle size={18} color="var(--emerald-400)" style={{ flexShrink: 0 }} />
+                <CheckCircle size={18} color="var(--emerald-main)" style={{ flexShrink: 0 }} />
               )}
               <div style={{ fontSize: '0.8rem', lineHeight: 1.4 }}>
                 {isDeficitRisk ? (

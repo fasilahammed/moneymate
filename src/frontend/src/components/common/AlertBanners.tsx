@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { AlertTriangle, AlertOctagon, X, ChevronDown, ChevronUp, Bell } from 'lucide-react';
-import type { AlertItem } from '../types';
+import type { AlertItem } from '../../types';
 
 interface AlertBannersProps {
   alerts: AlertItem[];

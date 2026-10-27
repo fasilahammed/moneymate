@@ -1,6 +1,6 @@
 import React from 'react';
 import { Shield, Calendar } from 'lucide-react';
-import type { SavingsGoal, SalaryProfile, DashboardMetrics } from '../types';
+import type { SavingsGoal, SalaryProfile, DashboardMetrics } from '../../types';
 
 interface SavingsGoalCardProps {
   goal: SavingsGoal;
@@ -20,7 +20,7 @@ export const SavingsGoalCard: React.FC<SavingsGoalCardProps> = ({ goal, salary, 
       style={{
         padding: '20px',
         marginBottom: '24px',
-        background: 'linear-gradient(135deg, rgba(6, 182, 212, 0.08), rgba(15, 23, 42, 0.7))',
+        background: 'linear-gradient(135deg, rgba(6, 182, 212, 0.08), var(--bg-card))',
         border: '1px solid rgba(6, 182, 212, 0.25)'
       }}
     >
@@ -28,19 +28,19 @@ export const SavingsGoalCard: React.FC<SavingsGoalCardProps> = ({ goal, salary, 
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <div
             style={{
-              width: '38px',
-              height: '38px',
-              borderRadius: '10px',
+              width: '40px',
+              height: '40px',
+              borderRadius: '12px',
               background: 'rgba(6, 182, 212, 0.15)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center'
             }}
           >
-            <Shield size={20} color="var(--cyan-400)" />
+            <Shield size={20} color="var(--cyan-main)" />
           </div>
           <div>
-            <div style={{ fontWeight: 700, fontSize: '1rem', color: '#ffffff' }}>
+            <div style={{ fontWeight: 700, fontSize: '1rem', color: 'var(--text-bright)' }}>
               {goal.title}
             </div>
             <div style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>
@@ -55,7 +55,7 @@ export const SavingsGoalCard: React.FC<SavingsGoalCardProps> = ({ goal, salary, 
             padding: '4px 10px',
             borderRadius: '20px',
             background: isHealthy ? 'rgba(16, 185, 129, 0.15)' : 'rgba(244, 63, 94, 0.15)',
-            color: isHealthy ? 'var(--emerald-400)' : 'var(--rose-400)',
+            color: isHealthy ? 'var(--emerald-main)' : 'var(--rose-main)',
             border: `1px solid ${isHealthy ? 'rgba(16, 185, 129, 0.3)' : 'rgba(244, 63, 94, 0.3)'}`,
             fontWeight: 700
           }}
@@ -71,7 +71,7 @@ export const SavingsGoalCard: React.FC<SavingsGoalCardProps> = ({ goal, salary, 
             className="progress-fill"
             style={{
               width: `${pct}%`,
-              background: 'linear-gradient(to right, var(--cyan-500), var(--emerald-400))'
+              background: 'linear-gradient(to right, var(--cyan-main), var(--emerald-main))'
             }}
           />
         </div>
@@ -79,7 +79,7 @@ export const SavingsGoalCard: React.FC<SavingsGoalCardProps> = ({ goal, salary, 
 
       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', marginTop: '6px' }}>
         <div>
-          <span style={{ fontWeight: 700, color: 'var(--cyan-400)', fontFamily: 'var(--font-heading)' }}>
+          <span style={{ fontWeight: 700, color: 'var(--cyan-main)', fontFamily: 'Outfit, sans-serif' }}>
             {salary.currency}{goal.currentAmount.toLocaleString()}
           </span>
           <span style={{ color: 'var(--text-dim)', fontSize: '0.75rem', marginLeft: '4px' }}>
@@ -88,7 +88,7 @@ export const SavingsGoalCard: React.FC<SavingsGoalCardProps> = ({ goal, salary, 
         </div>
         <div style={{ color: 'var(--text-muted)', fontSize: '0.78rem', display: 'flex', alignItems: 'center', gap: '4px' }}>
           <Calendar size={13} />
-          <span>Deadline: {goal.targetDate}</span>
+          <span>Target Date: {goal.targetDate}</span>
         </div>
       </div>
     </div>

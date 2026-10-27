@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { X, Wallet, Check } from 'lucide-react';
-import type { SalaryProfile } from '../types';
+import type { SalaryProfile } from '../../types';
 
 interface SalaryModalProps {
   isOpen: boolean;
@@ -40,10 +40,10 @@ export const SalaryModal: React.FC<SalaryModalProps> = ({
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <div className="modal-title">
-            <Wallet size={22} color="var(--emerald-400)" />
+            <Wallet size={22} color="var(--emerald-main)" />
             <span>Salary Profile & Cycle</span>
           </div>
-          <button className="modal-close-btn" onClick={onClose}>
+          <button className="modal-close-btn" onClick={onClose} type="button">
             <X size={18} />
           </button>
         </div>

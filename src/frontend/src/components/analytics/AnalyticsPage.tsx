@@ -6,7 +6,7 @@ import {
   ShieldCheck,
   Sparkles
 } from 'lucide-react';
-import type { CategoryStatus, DashboardMetrics, SalaryProfile, Transaction } from '../types';
+import type { CategoryStatus, DashboardMetrics, SalaryProfile, Transaction } from '../../types';
 
 interface AnalyticsPageProps {
   salary: SalaryProfile;
@@ -49,9 +49,6 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
     });
 
   // 2. 50/30/20 Rule Analysis
-  // Needs: Housing, Family, Food, Travel
-  // Wants: Buffer, Shopping
-  // Savings: Locked Savings
   const needsSpent = categoryStatuses
     .filter((c) => c.category.isEssential && c.category.id !== 'cat-savings')
     .reduce((sum, c) => sum + c.spent, 0);
@@ -67,7 +64,6 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
   const savingsPct = Math.round((savingsCommitted / salary.monthlyTakeHome) * 100);
 
   // 3. 30-Day Spending Trend (Cumulative)
-  // Simulate day by day spend based on transactions
   const daysInMonth = 31;
   const spendByDay: number[] = new Array(daysInMonth + 1).fill(0);
   transactions.forEach((tx) => {
@@ -86,12 +82,10 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
     cumulativeActual.push({ day: d, spent: runningTotal });
   }
 
-  // Max scale for chart is salary take-home
   const chartHeight = 160;
   const chartWidth = 500;
   const maxBudget = salary.monthlyTakeHome;
 
-  // Generate SVG path for actual curve
   const points = cumulativeActual.map((pt) => {
     const x = ((pt.day - 1) / (daysInMonth - 1)) * chartWidth;
     const y = chartHeight - (pt.spent / maxBudget) * chartHeight;
@@ -99,7 +93,6 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
   });
   const actualPath = `M ${points.join(' L ')}`;
 
-  // Ideal linear pace line from day 1 (0) to day 31 (budget limit ₹20k)
   const targetSpendLimit = salary.monthlyTakeHome - metrics.committedSavings;
   const paceYEnd = chartHeight - (targetSpendLimit / maxBudget) * chartHeight;
   const idealPacePath = `M 0,${chartHeight} L ${chartWidth},${paceYEnd}`;
@@ -187,7 +180,7 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
                 <div style={{ fontSize: '0.68rem', color: 'var(--text-dim)', textTransform: 'uppercase' }}>
                   Spent
                 </div>
-                <div style={{ fontFamily: 'Outfit', fontWeight: 800, fontSize: '1.25rem', color: 'var(--text-bright)' }}>
+                <div style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 800, fontSize: '1.25rem', color: 'var(--text-bright)' }}>
                   ₹{metrics.totalSpent.toLocaleString()}
                 </div>
                 <div style={{ fontSize: '0.72rem', color: 'var(--rose-main)', fontWeight: 600 }}>
@@ -217,7 +210,7 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
                         {slice.name}
                       </span>
                     </div>
-                    <div style={{ fontFamily: 'Outfit', fontWeight: 700, color: 'var(--text-bright)' }}>
+                    <div style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 700, color: 'var(--text-bright)' }}>
                       ₹{slice.spent.toLocaleString()} <span style={{ color: 'var(--text-dim)', fontSize: '0.75rem' }}>({slice.pct}%)</span>
                     </div>
                   </div>
@@ -241,18 +234,13 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
 
           <div style={{ padding: '8px 0' }}>
             <svg viewBox={`0 0 ${chartWidth} ${chartHeight + 30}`} className="burn-chart-svg">
-              {/* Grid Lines */}
               <line x1="0" y1="0" x2={chartWidth} y2="0" stroke="var(--border-subtle)" strokeDasharray="4 4" />
               <line x1="0" y1={chartHeight / 2} x2={chartWidth} y2={chartHeight / 2} stroke="var(--border-subtle)" strokeDasharray="4 4" />
               <line x1="0" y1={chartHeight} x2={chartWidth} y2={chartHeight} stroke="var(--border-subtle)" />
 
-              {/* Ideal Pace Line (Dashed Green) */}
               <path d={idealPacePath} fill="none" stroke="var(--emerald-main)" strokeWidth="2.5" strokeDasharray="6 4" />
-
-              {/* Actual Spending Curve (Solid Gradient / Rose) */}
               <path d={actualPath} fill="none" stroke="var(--rose-main)" strokeWidth="3" />
 
-              {/* Day Points */}
               {cumulativeActual.map((pt, i) => {
                 const x = ((pt.day - 1) / (daysInMonth - 1)) * chartWidth;
                 const y = chartHeight - (pt.spent / maxBudget) * chartHeight;
@@ -269,7 +257,6 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
                 );
               })}
 
-              {/* Today marker label */}
               <text x={chartWidth * 0.5} y={chartHeight + 20} fill="var(--text-dim)" fontSize="11" textAnchor="middle">
                 Day 16 (Today) • ₹{metrics.totalSpent.toLocaleString()} Spent
               </text>
@@ -289,7 +276,7 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
         </div>
       </div>
 
-      {/* DIAGRAM 3: Planned Budget Limit vs Actual Spending (Horizontal Comparison Bar Diagram) */}
+      {/* DIAGRAM 3: Budget Allocation vs. Actual Spending Comparison */}
       <div className="glass-panel diagram-card" style={{ marginBottom: '24px' }}>
         <div className="diagram-header">
           <div>
@@ -316,7 +303,7 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
                     <span>{cs.category.name}</span>
                   </div>
                   <div>
-                    <span style={{ fontFamily: 'Outfit', fontWeight: 700, color: isOver ? 'var(--rose-main)' : 'var(--text-bright)' }}>
+                    <span style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 700, color: isOver ? 'var(--rose-main)' : 'var(--text-bright)' }}>
                       ₹{spent.toLocaleString()}
                     </span>
                     <span style={{ color: 'var(--text-dim)', marginLeft: '4px' }}>
@@ -335,7 +322,6 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
                   </div>
                 </div>
 
-                {/* Multi-Bar comparison */}
                 <div style={{ position: 'relative', width: '100%', height: '10px', background: 'var(--pill-bg)', borderRadius: '6px', overflow: 'hidden' }}>
                   <div
                     style={{
@@ -355,7 +341,7 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
         </div>
       </div>
 
-      {/* DIAGRAM 4: The 50 / 30 / 20 Financial Health Rule Breakdown */}
+      {/* DIAGRAM 4: 50 / 30 / 20 Financial Rule Alignment */}
       <div className="glass-panel ratio-rule-card">
         <div className="diagram-header">
           <div>
@@ -382,7 +368,6 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
           </div>
         </div>
 
-        {/* Stacked Proportional Bar */}
         <div className="ratio-bar-multi">
           <div
             className="ratio-slice"
@@ -421,7 +406,7 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
             <div style={{ fontSize: '0.75rem', color: 'var(--text-dim)', textTransform: 'uppercase' }}>
               Essential Needs (Target: 50%)
             </div>
-            <div style={{ fontFamily: 'Outfit', fontWeight: 700, fontSize: '1.2rem', color: '#60a5fa' }}>
+            <div style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 700, fontSize: '1.2rem', color: '#60a5fa' }}>
               ₹{needsSpent.toLocaleString()} <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>({needsPct}%)</span>
             </div>
             <div style={{ fontSize: '0.72rem', color: 'var(--text-dim)' }}>Housing, Family & Groceries</div>
@@ -431,7 +416,7 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
             <div style={{ fontSize: '0.75rem', color: 'var(--text-dim)', textTransform: 'uppercase' }}>
               Discretionary Wants (Target: 30%)
             </div>
-            <div style={{ fontFamily: 'Outfit', fontWeight: 700, fontSize: '1.2rem', color: '#f59e0b' }}>
+            <div style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 700, fontSize: '1.2rem', color: '#f59e0b' }}>
               ₹{wantsSpent.toLocaleString()} <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>({wantsPct}%)</span>
             </div>
             <div style={{ fontSize: '0.72rem', color: 'var(--text-dim)' }}>Personal buffer, dining & leisure</div>
@@ -441,7 +426,7 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
             <div style={{ fontSize: '0.75rem', color: 'var(--text-dim)', textTransform: 'uppercase' }}>
               Committed Savings (Target: 20%)
             </div>
-            <div style={{ fontFamily: 'Outfit', fontWeight: 700, fontSize: '1.2rem', color: 'var(--emerald-main)' }}>
+            <div style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 700, fontSize: '1.2rem', color: 'var(--emerald-main)' }}>
               ₹{savingsCommitted.toLocaleString()} <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>({savingsPct}%)</span>
             </div>
             <div style={{ fontSize: '0.72rem', color: 'var(--text-dim)' }}>Locked Emergency Reserve</div>

@@ -8,17 +8,19 @@ import {
   calculateFinancials
 } from './data/financialEngine';
 import type { SalaryProfile, Category, Transaction, SavingsGoal, PaymentMethod } from './types';
-import { Header } from './components/Header';
-import type { ActiveTab } from './components/Header';
-import { SummaryCards } from './components/SummaryCards';
-import { AlertBanners } from './components/AlertBanners';
-import { CategoryGrid } from './components/CategoryGrid';
-import { SideAdvisor } from './components/SideAdvisor';
-import { TransactionList } from './components/TransactionList';
-import { SavingsGoalCard } from './components/SavingsGoalCard';
-import { AddTransactionModal } from './components/AddTransactionModal';
-import { SalaryModal } from './components/SalaryModal';
-import { AnalyticsPage } from './components/AnalyticsPage';
+import {
+  Header,
+  SummaryCards,
+  AlertBanners,
+  CategoryGrid,
+  SideAdvisor,
+  TransactionList,
+  SavingsGoalCard,
+  AddTransactionModal,
+  SalaryModal,
+  AnalyticsPage
+} from './components';
+import type { ActiveTab } from './components';
 
 export const App: React.FC = () => {
   // Theme State (Dark & Light Mode)
@@ -27,14 +29,14 @@ export const App: React.FC = () => {
   // Navigation Tab State
   const [activeTab, setActiveTab] = useState<ActiveTab>('dashboard');
 
-  // Financial App State
+  // Financial State
   const [salary, setSalary] = useState<SalaryProfile>(INITIAL_SALARY);
   const [categories, setCategories] = useState<Category[]>(INITIAL_CATEGORIES);
   const [transactions, setTransactions] = useState<Transaction[]>(INITIAL_TRANSACTIONS);
   const [savingsGoals, setSavingsGoals] = useState<SavingsGoal[]>(INITIAL_SAVINGS_GOALS);
   const [dismissedAlertIds, setDismissedAlertIds] = useState<string[]>([]);
 
-  // Modals
+  // Modal Visibility
   const [isAddExpenseOpen, setIsAddExpenseOpen] = useState(false);
   const [isSalaryModalOpen, setIsSalaryModalOpen] = useState(false);
 
@@ -107,7 +109,7 @@ export const App: React.FC = () => {
 
   return (
     <div className="app-layout">
-      {/* 1. Header with Page Tabs & Dark/Light Theme Switcher */}
+      {/* 1. Header Navigation & Theme Switcher */}
       <Header
         salary={salary}
         currentTheme={theme}
@@ -120,7 +122,7 @@ export const App: React.FC = () => {
       />
 
       <main className="main-content">
-        {/* Top Executive Summary Metric Cards (Available on all pages for persistent context) */}
+        {/* Persistent Top Executive Metrics */}
         <SummaryCards metrics={metrics} salary={salary} />
 
         {/* Real-Time Compact Alert Notification Bar */}
@@ -129,16 +131,14 @@ export const App: React.FC = () => {
         {/* TAB 1: MAIN DASHBOARD */}
         {activeTab === 'dashboard' && (
           <div className="dashboard-columns">
-            {/* LEFT MAIN COLUMN */}
+            {/* Left Content Column */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
-              {/* Category Budgets & Live Tracking Progress */}
               <CategoryGrid
                 categoryStatuses={categoryStatuses}
                 salary={salary}
                 onSelectCategory={() => setIsAddExpenseOpen(true)}
               />
 
-              {/* Savings Goal Status */}
               {savingsGoals.length > 0 && (
                 <SavingsGoalCard
                   goal={savingsGoals[0]}
@@ -147,7 +147,6 @@ export const App: React.FC = () => {
                 />
               )}
 
-              {/* Recent Transactions Ledger */}
               <TransactionList
                 transactions={transactions}
                 categories={categories}
@@ -156,7 +155,7 @@ export const App: React.FC = () => {
               />
             </div>
 
-            {/* RIGHT SIDE ADVISOR COLUMN (User's Core Requirement) */}
+            {/* Right Side Advisor Column */}
             <SideAdvisor
               advisor={advisor}
               metrics={metrics}
